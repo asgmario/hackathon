@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dare Generator</title>
+    <style>
+        /* General Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light gray */
+            color: #333; /* Dark gray */
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #007bff; /* Blue */
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        /* Main Content Styles */
+        main {
+            min-height: calc(100% - 160px); /* Subtract header, footer, and points container heights */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #0069d9; /* Dark blue */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Even darker blue */
+        }
+
+        /* Categories Styles */
+        #categories {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        /* Dare Container Styles */
+        .dare-container {
+            max-height: 300px;
+            overflow-y: auto; /* Enable scrolling if needed */
+            width: 80%;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .dare-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f1f1f1; /* Light gray */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .dare-item p {
+            margin: 0;
+        }
+
+        .dare-item .points {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-weight: bold;
+        }
+
+        /* Points Container Styles */
+        #points-container {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #007bff; /* Blue */
+            color: #fff;
+            width: 100%;
+        }
+
+        #total-points {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #007bff; /* Blue */
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dare Generator</h1>
+    </header>
+    <main>
+        <div id="categories">
+            <label><input type="checkbox" name="category" value="physical">Physical</label>
+            <label><input type="checkbox" name="category" value="social">Social</label>
+            <label><input type="checkbox" name="category" value="creative">Creative</label>
+            <!-- Add more categories as needed -->
+        </div>
+        <button id="generate-btn">Generate Dare</button>
+        <div class="dare-container" id="dare-container">
+            <!-- Dares will be displayed here -->
+        </div>
+        <div id="points-container">
+            <span id="total-points">Total Points: 0</span>
+        </div>
+    </main>
+    <footer>
+        <p>Made with ❤️ by Your Name</p>
+    </footer>
+    <script>
+        // JavaScript code for generating dares
+        var totalPoints = 0;
+        var completedDares = [];
+
+        var dareCategories = {
+            "physical": [
+                { dare: "Do 10 push-ups.", points: 10 },
+                { dare: "Run around the block.", points: 20 },
+                { dare: "Try a handstand.", points: 30 }
+            ],
+            "social": [
+                { dare: "Start a conversation with a stranger.", points: 15 },
+                { dare: "Compliment someone you don't know.", points: 20 },
+                { dare: "Ask for a high-five from a passerby.", points: 25 }
+            ],
+            "creative": [
+                { dare: "Draw a self-portrait blindfolded.", points: 20 },
+                { dare: "Write a short poem about the weather.", points: 25 },
+                { dare: "Create a dance to a random song.", points: 30 }
+            ],
+            // Add more dare categories and dares as needed
+        };
+
+        function generateDare() {
+            var selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(checkbox => checkbox.value);
+            if (selectedCategories.length !== 1) {
+                alert("Please only select one category.");
+                return;
+            }
+            var category = selectedCategories[0];
+            var dareList = dareCategories[category];
+            if (!dareList || dareList.length === 0) {
+                return null;
+            }
+            var randomIndex = Math.floor(Math.random() * dareList.length);
+            return dareList.splice(randomIndex, 1)[0];
+        }
+
+        function displayDare(dare) {
+            var dareContainer = document.getElementById('dare-container');
+            var dareItem = document.createElement('div');
+            dareItem.classList.add('dare-item');
+            dareItem.innerHTML = "<p>" + dare.dare + "</p><span class='points'>" + dare.points + " points</span><label><input type='checkbox' class='completed-checkbox'> Completed</label>";
+            dareContainer.appendChild(dareItem);
+        }
+
+        function updatePoints() {
+            var points = 0;
+            completedDares.forEach(function (dare) {
+                points += dare.points;
+            });
+            totalPoints = points;
+            document.getElementById('total-points').textContent = "Total Points: " + totalPoints;
+        }
+
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            var dareContainer = document.getElementById('dare-container');
+            dareContainer.innerHTML = '';
+            var dare = generateDare();
+            if (dare) {
+                displayDare(dare);
+            } else {
+                dareContainer.textContent = 'Out of dares';
+            }
+        });
+
+        document.getElementById('dare-container').addEventListener('change', function(event) {
+            if (event.target && event.target.matches('.completed-checkbox')) {
+                var dareItem = event.target.closest('.dare-item');
+                var dareIndex = parseInt(dareItem.dataset.index);
+                if (event.target.checked) {
+                    completedDares.push({
+                        points: parseInt(dareItem.querySelector('.points').textContent),
+                        index: dareIndex
+                    });
+                } else {
+                    completedDares = completedDares.filter(function(dare) {
+                        return dare.index !== dareIndex;
+                    });
+                }
+                updatePoints();
+            }
+        });
+    </script>
+</body>
+</html>
